@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+import os
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from octofit_tracker import views
 
 router = DefaultRouter()
@@ -26,8 +29,28 @@ router.register(r'activities', views.ActivityViewSet, basename='activity')
 router.register(r'workouts', views.WorkoutViewSet, basename='workout')
 router.register(r'leaderboard', views.LeaderboardViewSet, basename='leaderboard')
 
+
+@api_view(['GET'])
+def api_root_codespace(request, format=None):
+    """Return API root URLs using the Codespace hostname when available.
+    Falls back to http://localhost:8000 when CODESPACE_NAME is not set.
+    """
+    codespace = os.environ.get('CODESPACE_NAME')
+    if codespace:
+        base = f"https://{codespace}-8000.app.github.dev"
+    else:
+        base = "http://localhost:8000"
+
+    return Response({
+        'users': f"{base}/api/users/",
+        'teams': f"{base}/api/teams/",
+        'activities': f"{base}/api/activities/",
+        'workouts': f"{base}/api/workouts/",
+        'leaderboard': f"{base}/api/leaderboard/",
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('', views.api_root, name='api-root'),
+    path('', api_root_codespace, name='api-root'),
 ]
