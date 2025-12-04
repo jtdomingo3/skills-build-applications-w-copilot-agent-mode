@@ -1,3 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+octofit-tracker/backend/venv/
+
+# Editor directories
+.vscode/
 .DS_Store
 
 # Virtual Environment
